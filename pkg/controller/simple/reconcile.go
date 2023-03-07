@@ -13,7 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/klog/v2"
 )
 
 const (
@@ -75,7 +74,6 @@ func (c *controller) serviceSync(dpl *apiappsv1.Deployment) error {
 	// level1 存在
 
 	hasDealedTags := make(map[string]struct{})
-	klog.Errorf("debug globalTags  %v", c.globalTags)
 	for _, tag := range c.globalTags {
 		// 第一级tag 是否存在
 		fmt.Fprintf(os.Stdout, "%v  %v", tag.firstLevel, tag.secondLevel)
@@ -143,8 +141,9 @@ func (c *controller) fetchTagsFromDeploymentSpec(dpl *apiappsv1.Deployment) {
 		return
 	}
 	tmpTagSplit := strings.Split(tagValue, "|")
-	if len(tmpTagSplit) > 2 {
+	if len(tmpTagSplit) != 2 {
 		utilruntime.HandleError(fmt.Errorf("Invalid Tags %s: Tags to many %v", dpl.GetName(), tagValue))
+		return
 	}
 	if _, ok := c.globalTags[tmpTagSplit[0]+"|"+tmpTagSplit[1]]; !ok {
 		c.globalTags[tmpTagSplit[0]+"|"+tmpTagSplit[1]] = tagItem{

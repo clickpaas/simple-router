@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: clickpaas-tools
+  namespace: default
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: clickpaas
+rules:
+  - apiGroups: [""]
+    resources: [ "pods", "services", "events"]
+    verbs: ["get", "watch", "list", "create"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: clickpaas
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: clickpaas
+subjects:
+  - kind: ServiceAccount
+    name: clickpaas-tools
+    namespace: default
+---
+apiVersion:  apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: clickpaas-simplerouter
+  name: clickpaas-simplerouter
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickpaas-simplerouter
+  template:
+    metadata:
+      labels:
+        app: clickpaas-simplerouter
+    spec:
+      containers:
+      - name: clickpaas-simplerouter
+        image: registry.bizsaas.net/tools/simplerouter:20230307
+        imagePullPolicy: IfNotPresent
+        resources: {}
+      restartPolicy: Always
+      serviceAccount: clickpaas-tools

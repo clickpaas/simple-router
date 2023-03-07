@@ -46,6 +46,7 @@ func (o *Options) Validate() []error {
 	// valid tags valid, tags split must be <= 2
 	var retErrors []error
 	for _, tag := range o.MultiTag {
+        fmt.Printf("----> %v\n", tag)
 		tagSlice := strings.Split(tag, "|")
 		if len(tagSlice) > 2 {
 			retErrors = append(retErrors, fmt.Errorf("Options validate failed: Invalid tags: %v ", tag))

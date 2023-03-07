@@ -135,6 +135,10 @@ func (h *deploymentEventHandler) deploymentFilter(key string) bool {
 	if !strings.HasPrefix(key, "dmo") {
 		return false
 	}
+    // 包含tag的不做处理
+    if strings.Contains(key, "-tag") {
+        return false
+    }
 	// 在白名单里面继续处理
 	for _, wk := range h.config.WhiteDplList {
 		if strings.HasPrefix(key, wk) {
